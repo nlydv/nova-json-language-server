@@ -50,17 +50,10 @@
       },
       {
         "title": "Force Unlock Dependency Installation",
-        "command": "apexskier.json.forceClearLock"
+        "command": "apexskier.json.command.forceUnlock"
       }
     ],
     "editor": [
-      {
-        "title": "Go to Definition",
-        "command": "apexskier.json.goToDefinition",
-        "filters": {
-          "syntaxes": ["json", "jsonc"]
-        }
-      },
       {
         "title": "Offer Suggestions (experimental)",
         "command": "apexskier.json.autoSuggest",

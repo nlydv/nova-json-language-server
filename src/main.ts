@@ -3,7 +3,6 @@ import type * as lspTypes from "vscode-languageserver-protocol";
 import { dependencyManagement } from "nova-extension-utils";
 import { registerAutoSuggest } from "./commands/autoSuggest";
 import { registerApplyEdit } from "./requests/applyEdit";
-import { registerGoToDefinition } from "./commands/goToDefinition";
 import { InformationView } from "./informationView";
 
 nova.commands.register("apexskier.json.reload", reload);
@@ -98,7 +97,6 @@ async function asyncActivate() {
 
   // register nova commands
   compositeDisposable.add(registerAutoSuggest(client));
-  compositeDisposable.add(registerGoToDefinition(client));
 
   const manifestSchemaUrl = `file://${nova.path.join(
     nova.extension.path,
