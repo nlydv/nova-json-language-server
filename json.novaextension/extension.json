@@ -19,29 +19,6 @@
     "filesystem": "readwrite"
   },
 
-  "sidebars": [
-    {
-      "id": "apexskier.json.sidebar",
-      "name": "JSON",
-      "smallImage": "SidebarSmall",
-      "largeImage": "SidebarLarge",
-      "sections": [
-        {
-          "id": "apexskier.json.sidebar.info",
-          "name": "Information",
-          "placeholderText": "JSON Extension Information",
-          "headerCommands": [
-            {
-              "title": "Refresh",
-              "image": "__builtin.refresh",
-              "command": "apexskier.json.reload"
-            }
-          ]
-        }
-      ]
-    }
-  ],
-
   "commands": {
     "extensions": [
       {

@@ -3,7 +3,6 @@ import type * as lspTypes from "vscode-languageserver-protocol";
 import { dependencyManagement } from "nova-extension-utils";
 import { registerAutoSuggest } from "./commands/autoSuggest";
 import { registerApplyEdit } from "./requests/applyEdit";
-import { InformationView } from "./informationView";
 
 nova.commands.register("apexskier.json.reload", reload);
 
@@ -37,17 +36,7 @@ async function reload() {
 }
 
 async function asyncActivate() {
-  const informationView = new InformationView();
-  compositeDisposable.add(informationView);
-
-  informationView.status = "Activating...";
-
-  try {
-    await dependencyManagement.installWrappedDependencies(compositeDisposable);
-  } catch (err) {
-    informationView.status = "Failed to install";
-    throw err;
-  }
+  await dependencyManagement.installWrappedDependencies(compositeDisposable);
 
   const runFile = nova.path.join(nova.extension.path, "run.sh");
 
@@ -179,10 +168,6 @@ async function asyncActivate() {
   });
 
   client.start();
-
-  informationView.status = "Running";
-
-  informationView.reload(); // this is needed, otherwise the view won't show up properly, possibly a Nova bug
 }
 
 export function activate() {
