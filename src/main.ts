@@ -153,6 +153,10 @@ async function asyncActivate() {
   client.start();
 }
 
+let napCheck: any;
+let wakeCheck: Disposable | null = null;
+const isJson = (doc: TextDocument) => !! doc.syntax?.match(/^jsonc?$/i);
+
 export async function activate() {
   console.log("activating...");
 
@@ -161,6 +165,20 @@ export async function activate() {
     notification.body = "JSON extension is loading";
     nova.notifications.add(notification);
   }
+
+  napCheck = setInterval(() => {
+    if ( client?.running && ! nova.workspace.textDocuments.some(isJson) ) {
+      nova.inDevMode() && console.log("nap time")
+      client.stop();
+    }
+  }, 300e3) // 5 mins;
+
+  wakeCheck = nova.workspace.onDidOpenTextDocument(doc => {
+    if ( client && ! client.running && isJson(doc) ) {
+      nova.inDevMode() && console.log("wakey wakey");
+      client.start();
+    }
+  })
 
   await asyncActivate()
     .then(() => console.log("activated"))
@@ -171,6 +189,8 @@ export async function activate() {
 }
 
 export function deactivate() {
+  clearInterval(napCheck);
+  wakeCheck?.dispose();
   client?.stop();
   compositeDisposable.dispose();
 }

@@ -4,6 +4,7 @@ type Element = {
   readonly identifier: string;
 };
 
+// @ts-ignore -- type conflict between TS' and Nova's `Disposable` interface
 export class InformationView implements TreeDataProvider<Element>, Disposable {
   constructor() {
     this._treeView = new TreeView("apexskier.json.sidebar.info", {
