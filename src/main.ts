@@ -4,6 +4,8 @@ import { dependencyManagement } from "nova-extension-utils";
 import { registerAutoSuggest } from "./commands/autoSuggest";
 import { registerApplyEdit } from "./requests/applyEdit";
 
+const { getDependencyDirectory } = dependencyManagement;
+
 nova.commands.register("apexskier.json.reload", reload);
 
 let client: LanguageClient | null = null;
@@ -13,22 +15,6 @@ dependencyManagement.registerDependencyUnlockCommand(
   "apexskier.json.command.forceUnlock"
 );
 
-async function makeFileExecutable(file: string) {
-  return new Promise<void>((resolve, reject) => {
-    const process = new Process("/usr/bin/env", {
-      args: ["chmod", "u+x", file],
-    });
-    process.onDidExit((status) => {
-      if (status === 0) {
-        resolve();
-      } else {
-        reject(status);
-      }
-    });
-    process.start();
-  });
-}
-
 async function reload() {
   deactivate();
   console.log("reloading...");
@@ -36,14 +22,27 @@ async function reload() {
 }
 
 async function asyncActivate() {
-  await dependencyManagement.installWrappedDependencies(compositeDisposable);
+  await dependencyManagement
+    .installWrappedDependencies(compositeDisposable)
+    .catch(e => {
+      console.log(`Failed to install dependencies\n${e}`);
+      throw e;
+    });
 
-  const runFile = nova.path.join(nova.extension.path, "run.sh");
+  const exec = nova.path.normalize(nova.path.join(
+    getDependencyDirectory(),
+    "node_modules",
+    "vscode-json-languageserver",
+    "bin",
+    "vscode-json-languageserver"
+  ));
 
-  // Uploading to the extension library makes this file not executable, so fix that
-  await makeFileExecutable(runFile);
+  const serverOptions: ServerOptions = {
+    path: exec,
+    args: ["--stdio"],
+    type: "stdio"
+  };
 
-  let serviceArgs;
   if (nova.inDevMode()) {
     const logDir = nova.path.join(nova.extension.workspaceStoragePath, "logs");
     await new Promise<void>((resolve, reject) => {
@@ -57,31 +56,15 @@ async function asyncActivate() {
     // passing inLog breaks some requests for an unknown reason
     // const inLog = nova.path.join(logDir, "languageServer-in.log");
     const outLog = nova.path.join(logDir, "languageServer-out.log");
-    serviceArgs = {
-      path: "/usr/bin/env",
-      // args: ["bash", "-c", `tee -a "${inLog}" | "${runFile}" | tee -a "${outLog}"`],
-      args: ["bash", "-c", `"${runFile}" | tee -a "${outLog}"`],
-    };
-  } else {
-    serviceArgs = {
-      path: runFile,
-    };
+    serverOptions.args = ["bash", "-c", `"${serverOptions.path}" --stdio | tee -a "${outLog}"`],
+    serverOptions.path = "/usr/bin/env";
   }
 
   client = new LanguageClient(
     "apexskier.json",
     "JSON Language Server",
-    {
-      type: "stdio",
-      ...serviceArgs,
-      env: {
-        WORKSPACE_DIR: nova.workspace.path ?? "",
-        INSTALL_DIR: dependencyManagement.getDependencyDirectory(),
-      },
-    },
-    {
-      syntaxes: ["json", "jsonc"],
-    }
+    serverOptions,
+    { syntaxes: ["json", "jsonc"] }
   );
 
   // register nova commands
@@ -170,21 +153,20 @@ async function asyncActivate() {
   client.start();
 }
 
-export function activate() {
+export async function activate() {
   console.log("activating...");
+
   if (nova.inDevMode()) {
     const notification = new NotificationRequest("activated");
     notification.body = "JSON extension is loading";
     nova.notifications.add(notification);
   }
-  return asyncActivate()
-    .catch((err) => {
-      console.error("Failed to activate");
-      console.error(err);
+
+  await asyncActivate()
+    .then(() => console.log("activated"))
+    .catch(err => {
+      console.error(`Failed to activate\n${err}`);
       nova.workspace.showErrorMessage(err);
-    })
-    .then(() => {
-      console.log("activated");
     });
 }
 

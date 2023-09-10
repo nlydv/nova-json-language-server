@@ -1,12 +1,54 @@
 {
-  "compilerOptions": {
-    "target": "es5",
-    "sourceMap": true,
-    "noEmit": true,
-    "strict": true,
-    "noImplicitReturns": true,
-    "noFallthroughCasesInSwitch": true,
-    "experimentalDecorators": true,
-    "forceConsistentCasingInFileNames": true
-  }
+    "$schema": "https://json.schemastore.org/tsconfig",
+    "compilerOptions": {
+        "downlevelIteration": true,
+
+        "module": "es2020",
+        "moduleResolution": "bundler",
+        "isolatedModules": true,
+        "esModuleInterop": true,
+        "resolveJsonModule": false,
+        "allowUmdGlobalAccess": false,
+        "resolvePackageJsonImports": false,
+        "resolvePackageJsonExports": false,
+        "allowImportingTsExtensions": false,
+        "allowSyntheticDefaultImports": true,
+
+        "experimentalDecorators": false,
+        "useDefineForClassFields": false,
+
+        "allowJs": true,
+        "checkJs": true,
+        "skipLibCheck": false,
+        "skipDefaultLibCheck": true,
+
+        "strict": false,
+        "strictNullChecks": true,
+        "strictBindCallApply": true,
+        "strictFunctionTypes": true,
+        "strictPropertyInitialization": true,
+        "noImplicitAny": true,
+        "noImplicitThis": true,
+        "noImplicitReturns": true,
+        "noImplicitOverride": true,
+        "noUnusedLocals": false,
+        "noUnusedParameters": false,
+        "allowUnreachableCode": false,
+
+        "pretty": true,
+        "removeComments": true,
+        "forceConsistentCasingInFileNames": true,
+        "newLine": "lf",
+
+        "noEmit": true,
+        "declaration": false
+    },
+    "include": [
+        "src/**/*.js",
+        "src/**/*.ts"
+    ],
+    "exclude": [ "src/**/*.test.*" ],
+    "typeAcquisition": {
+        "enable": false
+    }
 }

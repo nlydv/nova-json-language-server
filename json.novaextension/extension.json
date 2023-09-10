@@ -11,7 +11,7 @@
 
   "main": "main.dist.js",
 
-  "activationEvents": ["onLanguage:json", "onWorkspaceContains:*.json"],
+  "activationEvents": [ "onLanguage:json" ],
 
   "entitlements": {
     "process": true,
